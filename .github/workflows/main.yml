@@ -9,7 +9,7 @@ on:
       - main  # Trigger on PR to the main branch
 
 jobs:
-  build:
+  docker:
     runs-on: ubuntu-latest
 
     steps:
