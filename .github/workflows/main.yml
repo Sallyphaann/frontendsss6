@@ -43,7 +43,18 @@ jobs:
         run: |
           npm install
           npm install @babel/plugin-proposal-private-property-in-object --save-dev
+      - name: Pull backend Docker image
+        run: |
+          docker pull sallyphaan/authenticationcc:latest
 
+      # Step 6: Start the backend in Docker
+      - name: Start backend in Docker
+        run: |
+          docker run -d -p 8081:8081 --name backend-container sallyphaan/authenticationcc:latest
+      - name: Wait for backend to be ready
+        run: |
+          npx wait-on http://localhost:8081
+          echo "Backend is ready!"
       - name: Start React server
         run: npm start &  # Start the React server in the background
         env:
