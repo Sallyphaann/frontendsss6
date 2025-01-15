@@ -1,0 +1,71 @@
+name: CI/CD Pipeline for Frontend
+
+on:
+  push:
+    branches:
+      - main  # Trigger the pipeline on push to main branch
+  pull_request:
+    branches:
+      - main  # Trigger on PR to the main branch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'  # Use the Node.js version required by your React project
+          cache: 'npm'  # Cache npm dependencies for faster builds
+
+      - name: Install dependencies
+        run: npm install  # Or `yarn install` if using Yarn
+
+      - name: Build frontend
+        run: npm run build  # Build the React project
+
+  cypress-test:
+    runs-on: ubuntu-latest  # Use `ubuntu-latest` instead of `ubuntu-24.04` (not yet available)
+    needs: build  # Ensure this job runs after the build job
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run Cypress tests
+        uses: cypress-io/github-action@v6
+        with:
+          build: npm run build
+          start: npm run dev  # Ensure this command starts your development server
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: cypress-test  # Ensure this job runs after the Cypress tests
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}  # Use `DOCKER_HUB_USERNAME` for clarity
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}  # Use `DOCKER_HUB_PASSWORD` for clarity
+
+      - name: Build Docker image
+        run: |
+          docker build -t sallyphaan/frontendindividualss6:latest .
+
+      - name: Push Docker image to Docker Hub
+        run: |
+          docker push sallyphaan/frontendindividualss6:latest
