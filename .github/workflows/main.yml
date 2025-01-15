@@ -28,16 +28,27 @@ jobs:
       - name: Build frontend
         run: npm run build
   Cypress-test:
-     runs-on: ubuntu-24.04
-     needs: [ build ]
-     steps:
-      - name: Checkout
+    runs-on: ubuntu-latest  # Use `ubuntu-latest` instead of `ubuntu-24.04` (not yet available)
+    needs: [ build ]  # Ensure this job runs after the `build` job
+    steps:
+      - name: Checkout code
         uses: actions/checkout@v4
-      # Install npm dependencies, cache them correctly
-      # and run all Cypress tests
-      - name: Cypress run
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm install
+          npm install @babel/plugin-proposal-private-property-in-object --save-dev
+
+      - name: Run Cypress tests
         uses: cypress-io/github-action@v6
         with:
           build: npm run build
-          start: npm run dev
+          start: npm run dev  # Ensure this command starts your development server
+
 
