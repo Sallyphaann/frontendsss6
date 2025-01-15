@@ -9,9 +9,38 @@ on:
       - main  # Trigger on PR to the main branch
 
 jobs:
-  docker:
+ build:
     runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
+      - name: Install Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'  # Use the Node.js version required by your React project
+
+      - name: Install dependencies
+        run: npm install  # Or `yarn install` if using Yarn
+
+      - name: Build frontend
+        run: npm run build  # O
+ Cypress-test:
+     runs-on: ubuntu-24.04
+     needs: [ build ]
+     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      # Install npm dependencies, cache them correctly
+      # and run all Cypress tests
+      - name: Cypress run
+        uses: cypress-io/github-action@v6
+        with:
+          build: npm run build
+          start: npm run dev
+ docker:
+    runs-on: ubuntu-latest
+    needs: Cypress-test
     steps:
    
     - name: Checkout code
