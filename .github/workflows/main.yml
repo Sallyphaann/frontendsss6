@@ -37,14 +37,23 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18  # Use the Node.js version compatible with your project
+          node-version: 22  # Use Node.js v22
 
       - name: Install dependencies
         run: |
           npm install
           npm install @babel/plugin-proposal-private-property-in-object --save-dev
 
+      - name: Start React server
+        run: npm start &  # Start the React server in the background
+        env:
+          CI: true  # Run in CI mode to avoid interactive prompts
+
+      - name: Wait for React server to start
+        run: |
+          npx wait-on http://localhost:3000  # Wait for the server to be ready
+          echo "React server is running!"
+
       - name: Run Cypress tests
         run: npx cypress run  # Runs Cypress in headless mode
-      
 
