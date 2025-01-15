@@ -27,7 +27,7 @@ jobs:
 
       - name: Build frontend
         run: npm run build
-  cypress-test:
+  endtoend:
     runs-on: ubuntu-latest
     needs: build
     steps:
@@ -65,7 +65,7 @@ jobs:
         run: npx cypress run  # Runs Cypress in headless mode
   docker:
     runs-on: ubuntu-latest
-    needs: cypress-test
+    needs: endtoend
     steps:
    
     - name: Checkout code
