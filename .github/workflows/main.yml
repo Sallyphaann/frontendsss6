@@ -27,3 +27,17 @@ jobs:
 
       - name: Build frontend
         run: npm run build
+  Cypress-test:
+     runs-on: ubuntu-24.04
+     needs: [ build ]
+     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      # Install npm dependencies, cache them correctly
+      # and run all Cypress tests
+      - name: Cypress run
+        uses: cypress-io/github-action@v6
+        with:
+          build: npm run build
+          start: npm run dev
+
